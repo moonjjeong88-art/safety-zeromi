@@ -42,6 +42,22 @@
   </style>
 </head>
 <body class="min-h-screen touch-manipulation bg-slate-950 text-slate-100 antialiased">
+  <!-- 배경음: assets/화염 속으로.mp3 -->
+  <audio id="app-bgm" preload="metadata" playsinline loop>
+    <source src="assets/%ED%99%94%EC%97%BC%20%EC%86%8D%EC%9C%BC%EB%A1%9C.mp3" type="audio/mpeg" />
+  </audio>
+
+  <button
+    type="button"
+    id="btn-bgm-toggle"
+    class="fixed right-4 top-4 z-[95] inline-flex touch-manipulation items-center gap-1.5 rounded-full border border-slate-700/90 bg-slate-900/90 px-3 py-2 text-xs font-semibold text-slate-200 shadow-lg shadow-black/30 backdrop-blur-sm transition hover:bg-slate-800/95 hover:border-emerald-500/40 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 active:scale-[0.97] sm:right-6 sm:text-sm"
+    aria-pressed="false"
+    aria-label="배경 음악 켜기"
+  >
+    <span id="btn-bgm-icon" class="leading-none" aria-hidden="true">🔇</span>
+    <span id="btn-bgm-label">음악 켜기</span>
+  </button>
+
   <div class="pointer-events-none fixed inset-0 overflow-hidden">
     <div class="absolute -left-32 top-20 h-72 w-72 rounded-full bg-emerald-500/15 blur-3xl"></div>
     <div class="absolute -right-24 bottom-32 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl"></div>
@@ -548,6 +564,12 @@
     const TAB_FOCUS =
       'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400';
 
+    const bgmState = {
+      /** 사용자가 명시적으로 끈 상태면 자동 재생하지 않음 */
+      userMuted: false,
+      defaultVolume: 0.34,
+    };
+
     const el = {
       progressLabel: document.getElementById('progress-label'),
       progressBar: document.getElementById('progress-bar'),
@@ -573,7 +595,36 @@
       subscribeModal: document.getElementById('subscribe-modal'),
       btnSubscribeAndResult: document.getElementById('btn-subscribe-and-result'),
       btnSubscribeLater: document.getElementById('btn-subscribe-later'),
+      bgm: document.getElementById('app-bgm'),
+      btnBgmToggle: document.getElementById('btn-bgm-toggle'),
+      btnBgmIcon: document.getElementById('btn-bgm-icon'),
+      btnBgmLabel: document.getElementById('btn-bgm-label'),
     };
+
+    function refreshBgmToggleUi() {
+      if (!el.bgm || !el.btnBgmToggle) return;
+      const playing = !el.bgm.paused;
+      el.btnBgmToggle.setAttribute('aria-pressed', playing ? 'true' : 'false');
+      el.btnBgmToggle.setAttribute('aria-label', playing ? '배경 음악 끄기' : '배경 음악 켜기');
+      if (el.btnBgmIcon) el.btnBgmIcon.textContent = playing ? '🔊' : '🔇';
+      if (el.btnBgmLabel) el.btnBgmLabel.textContent = playing ? '음악 끄기' : '음악 켜기';
+    }
+
+    function pauseBgm() {
+      if (!el.bgm) return;
+      el.bgm.pause();
+      refreshBgmToggleUi();
+    }
+
+    function tryResumeBgm() {
+      if (!el.bgm || bgmState.userMuted) return;
+      el.bgm.volume = bgmState.defaultVolume;
+      const p = el.bgm.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => {});
+      }
+      refreshBgmToggleUi();
+    }
 
     function renderTabs() {
       const onQ = state.uiTab === 'questions';
@@ -620,6 +671,8 @@
     function revealQuizFromCover() {
       if (el.btnStartQuiz.disabled) return;
       el.btnStartQuiz.disabled = true;
+
+      tryResumeBgm();
 
       el.startScreen.classList.add('cover-leaving');
 
@@ -782,9 +835,27 @@
       finishQuizAfterSubscribePrompt(false);
     });
 
+    if (el.bgm) {
+      el.bgm.addEventListener('play', refreshBgmToggleUi);
+      el.bgm.addEventListener('pause', refreshBgmToggleUi);
+    }
+
+    el.btnBgmToggle.addEventListener('click', () => {
+      if (!el.bgm) return;
+      const playing = !el.bgm.paused;
+      if (playing) {
+        bgmState.userMuted = true;
+        pauseBgm();
+        return;
+      }
+      bgmState.userMuted = false;
+      tryResumeBgm();
+    });
+
     el.btnStartQuiz.addEventListener('click', revealQuizFromCover);
 
     el.btnRestart.addEventListener('click', restart);
+    refreshBgmToggleUi();
     renderQuestion();
   </script>
 </body>
