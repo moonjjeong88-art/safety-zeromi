@@ -1,0 +1,4 @@
+# Site uses assets/zeromi.png; keep repo lean
+Gemini_Generated*.png
+Thumbs.db
+.DS_Store
