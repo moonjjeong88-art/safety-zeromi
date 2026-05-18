@@ -1,5 +1,8 @@
 /** 알 깨기 테스트 — 문항·결과·채점 */
 
+const YOUTUBE_CHANNEL_BOOK_MELODY_URL =
+  "https://www.youtube.com/@%EC%9E%98%EC%82%AC%EB%8A%94%EB%B2%95-s6e";
+
 const PARTS = [
   { id: "1부", title: "두 세계의 경계", range: [0, 4], subtitle: "기본 성향 및 환경 리액션" },
   { id: "2부", title: "크로머의 습격", range: [5, 9], subtitle: "위기 대처 및 트라우마 마주하기" },
@@ -180,7 +183,7 @@ function phaseForQuestionIndex(i) {
 }
 
 function setPhase(phase) {
-  const rootScreens = ["screen-landing", "screen-quiz", "screen-result"];
+  const rootScreens = ["screen-landing", "screen-quiz", "screen-subscribe", "screen-result"];
   for (const id of rootScreens) {
     const el = document.getElementById(id);
     if (el && !el.classList.contains("hidden")) {
@@ -213,7 +216,7 @@ function resolveResult(answers) {
 }
 
 function showScreen(id) {
-  for (const sid of ["screen-landing", "screen-quiz", "screen-result"]) {
+  for (const sid of ["screen-landing", "screen-quiz", "screen-subscribe", "screen-result"]) {
     document.getElementById(sid).classList.toggle("hidden", sid !== id);
   }
 }
@@ -254,15 +257,26 @@ function renderResult(result) {
   document.getElementById("result-quote").textContent = result.quote;
 }
 
+function showSubscribeGate() {
+  showScreen("screen-subscribe");
+  setPhase("bright");
+  const meta = document.getElementById("meta-theme");
+  if (meta) meta.setAttribute("content", "#c4b5fd");
+}
+
+function goToResult() {
+  const r = resolveResult(state.answers);
+  showScreen("screen-result");
+  renderResult(r);
+}
+
 function onAnswer(value) {
   state.answers[state.index] = value;
   if (state.index < QUESTIONS.length - 1) {
     state.index++;
     renderQuestion();
   } else {
-    const r = resolveResult(state.answers);
-    showScreen("screen-result");
-    renderResult(r);
+    showSubscribeGate();
   }
 }
 
@@ -318,5 +332,12 @@ document.getElementById("choice-b").addEventListener("click", () => onAnswer("B"
 
 document.getElementById("btn-retry").addEventListener("click", reset);
 document.getElementById("btn-share").addEventListener("click", shareResult);
+
+document.getElementById("btn-subscribe-then-result").addEventListener("click", () => {
+  window.open(YOUTUBE_CHANNEL_BOOK_MELODY_URL, "_blank", "noopener,noreferrer");
+  goToResult();
+});
+
+document.getElementById("btn-result-only").addEventListener("click", goToResult);
 
 setPhase("bright");

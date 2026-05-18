@@ -283,6 +283,57 @@ body {
   color: var(--muted);
 }
 
+/* Subscribe gate */
+.subscribe-card {
+  padding: 22px 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--choice-border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.subscribe-kicker {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent2);
+}
+
+.subscribe-question {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+}
+
+.subscribe-channel {
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+.subscribe-note {
+  margin: 14px 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.subscribe-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.screen--subscribe {
+  padding-top: 8px;
+}
+
 /* Quiz */
 .quiz-meta {
   display: flex;

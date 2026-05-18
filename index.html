@@ -68,6 +68,21 @@
         </div>
       </section>
 
+      <!-- Subscribe gate (after quiz, before result) -->
+      <section class="screen screen--subscribe hidden" id="screen-subscribe" data-phase="bright" aria-live="polite">
+        <div class="subscribe-card">
+          <p class="subscribe-kicker">거의 다 됐어요</p>
+          <h2 class="subscribe-question">
+            <span class="subscribe-channel">『책멜로디삶』</span> 유튜브 채널을<br />구독하시겠습니까?
+          </h2>
+          <p class="subscribe-note">구독은 선택이에요. 원하시면 채널이 새 창으로 열립니다.</p>
+        </div>
+        <div class="subscribe-actions">
+          <button type="button" class="btn btn--primary" id="btn-subscribe-then-result">구독하고 결과보기</button>
+          <button type="button" class="btn btn--ghost" id="btn-result-only">그냥 결과보기</button>
+        </div>
+      </section>
+
       <!-- Result -->
       <section class="screen screen--result hidden" id="screen-result" data-phase="result">
         <div class="result-hero">
