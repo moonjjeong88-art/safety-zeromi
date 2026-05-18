@@ -2,861 +2,113 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>나의 안전 성향 테스트</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Pretendard Variable"', 'Pretendard', 'system-ui', 'sans-serif'],
-          },
-        },
-      },
-    };
-  </script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" crossorigin />
-  <style>
-    #start-screen {
-      transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1), transform 450ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    #start-screen.cover-leaving {
-      opacity: 0;
-      transform: scale(0.985);
-      pointer-events: none;
-    }
-    #quiz-screen.quiz-entering {
-      animation: quizEnter 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-    @keyframes quizEnter {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta id="meta-theme" name="theme-color" content="#c4b5fd" />
+  <meta name="description" content="나의 멘탈 세계관 진단 — 데미안에서 영감을 받은 20문항 밸런스 게임" />
+  <meta property="og:title" content="알 깨기 테스트 | 나의 멘탈 세계관 진단" />
+  <meta property="og:description" content="데미안에서 영감을 받은 20문항 밸런스 게임. 3초 안에 더 끌리는 선택을 고르세요." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>알 깨기 테스트 | 나의 멘탈 세계관 진단</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body class="min-h-screen touch-manipulation bg-slate-950 text-slate-100 antialiased">
-  <!-- 배경음: assets/화염 속으로.mp3 -->
-  <audio id="app-bgm" preload="metadata" playsinline loop>
-    <source src="assets/%ED%99%94%EC%97%BC%20%EC%86%8D%EC%9C%BC%EB%A1%9C.mp3" type="audio/mpeg" />
-  </audio>
+<body data-phase="bright">
+  <div class="noise" aria-hidden="true"></div>
+  <div class="app" id="app">
+    <header class="top-bar">
+      <span class="logo-mark" aria-hidden="true">✦</span>
+      <span class="logo-text">알 깨기 테스트</span>
+    </header>
 
-  <button
-    type="button"
-    id="btn-bgm-toggle"
-    class="fixed right-4 top-4 z-[95] inline-flex touch-manipulation items-center gap-1.5 rounded-full border border-slate-700/90 bg-slate-900/90 px-3 py-2 text-xs font-semibold text-slate-200 shadow-lg shadow-black/30 backdrop-blur-sm transition hover:bg-slate-800/95 hover:border-emerald-500/40 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 active:scale-[0.97] sm:right-6 sm:text-sm"
-    aria-pressed="false"
-    aria-label="배경 음악 켜기"
-  >
-    <span id="btn-bgm-icon" class="leading-none" aria-hidden="true">🔇</span>
-    <span id="btn-bgm-label">음악 켜기</span>
-  </button>
+    <main class="main">
+      <!-- Landing -->
+      <section class="screen screen--landing" id="screen-landing" data-phase="bright">
+        <div class="hero-badge">밸런스 게임 · 20문항</div>
+        <h1 class="title">나의 멘탈<br />세계관 진단</h1>
+        <p class="subtitle">헤르만 헤세 『데미안』에서 영감을 받은 가벼운 자기 탐색 테스트입니다.</p>
+        <div class="guide-card">
+          <p class="guide-title">플레이 가이드</p>
+          <p class="guide-body">깊게 고민하지 말고 <strong>3초 안에</strong> 더 끌리는 선택지를 터치하세요!</p>
+        </div>
+        <button type="button" class="btn btn--primary" id="btn-start">시작하기</button>
+        <p class="hint">약 2~3분 · 결과 4종 · 공유하기 좋게 만들었었어요</p>
+      </section>
 
-  <div class="pointer-events-none fixed inset-0 overflow-hidden">
-    <div class="absolute -left-32 top-20 h-72 w-72 rounded-full bg-emerald-500/15 blur-3xl"></div>
-    <div class="absolute -right-24 bottom-32 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl"></div>
+      <!-- Quiz -->
+      <section class="screen screen--quiz hidden" id="screen-quiz" data-phase="bright" aria-live="polite">
+        <div class="quiz-meta">
+          <span class="part-label" id="part-label">1부</span>
+          <span class="progress" id="progress-text">1 / 20</span>
+        </div>
+        <div class="progress-bar" role="presentation">
+          <div class="progress-bar__fill" id="progress-fill"></div>
+        </div>
+        <h2 class="question" id="question-text"></h2>
+        <div class="choices">
+          <button type="button" class="choice choice--a" id="choice-a" data-value="A">
+            <span class="choice__tag">A</span>
+            <span class="choice__text" id="choice-a-text"></span>
+          </button>
+          <button type="button" class="choice choice--b" id="choice-b" data-value="B">
+            <span class="choice__tag">B</span>
+            <span class="choice__text" id="choice-b-text"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Result -->
+      <section class="screen screen--result hidden" id="screen-result" data-phase="result">
+        <div class="result-hero">
+          <div class="abraxas-frame" aria-hidden="true">
+            <svg class="abraxas-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="currentColor" stop-opacity="0.95" />
+                  <stop offset="100%" stop-color="currentColor" stop-opacity="0.35" />
+                </linearGradient>
+              </defs>
+              <g fill="none" stroke="url(#g1)" stroke-width="1.2">
+                <circle cx="100" cy="100" r="72" />
+                <circle cx="100" cy="100" r="46" />
+                <path d="M100 28 L100 172 M28 100 L172 100 M52 52 L148 148 M148 52 L52 148" />
+                <polygon points="100,40 128,92 172,92 138,124 152,168 100,138 48,168 62,124 28,92 72,92" />
+              </g>
+            </svg>
+          </div>
+          <p class="result-type-num" id="result-type-num"></p>
+          <h2 class="result-title" id="result-title"></h2>
+          <p class="result-tagline" id="result-tagline"></p>
+        </div>
+
+        <article class="result-section">
+          <h3 class="result-section__h">내면세계 분석</h3>
+          <p class="result-section__p" id="result-inner"></p>
+        </article>
+        <article class="result-section">
+          <h3 class="result-section__h">숨겨진 무의식의 그림자</h3>
+          <p class="result-section__p" id="result-shadow"></p>
+        </article>
+        <article class="result-section result-section--accent">
+          <h3 class="result-section__h">당신의 성장 모멘텀</h3>
+          <p class="result-section__p" id="result-growth"></p>
+        </article>
+        <blockquote class="demian-quote" id="result-quote"></blockquote>
+
+        <div class="result-actions">
+          <button type="button" class="btn btn--primary" id="btn-retry">다시 하기</button>
+          <button type="button" class="btn btn--ghost" id="btn-share">결과 공유</button>
+        </div>
+        <p class="share-fallback hidden" id="share-fallback">링크를 복사해 주세요. (브라우저가 공유를 지원하지 않습니다)</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <small>© 알 깨기 테스트 · 『데미안』 오마주 · 진단이 아닌 놀이입니다</small>
+    </footer>
   </div>
-
-  <main class="relative mx-auto flex min-h-screen max-w-lg flex-col px-4 py-10 sm:px-6">
-    <!-- Cover -->
-    <section
-      id="start-screen"
-      aria-label="테스트 시작 화면"
-      class="flex min-h-[min(100vh-5rem,40rem)] flex-1 flex-col items-center justify-center py-8"
-    >
-      <div class="mx-auto flex w-full max-w-md flex-col items-center rounded-3xl border border-slate-800/90 bg-slate-900/70 p-8 shadow-2xl shadow-black/35 ring-1 ring-white/[0.06] backdrop-blur-md sm:p-10">
-        <div class="w-full shrink-0 overflow-hidden rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
-          <img
-            src="./watermarked_img_693823784582033683.png.png"
-            alt="나의 안전 성향 테스트 표지 일러스트"
-            class="aspect-[4/3] w-full object-cover object-center"
-            width="800"
-            height="600"
-            decoding="async"
-          />
-        </div>
-        <h1 class="mt-8 text-center text-2xl font-bold leading-snug tracking-tight text-white sm:text-[1.75rem]">
-          나의 안전 성향 테스트 (Safety MBTI)
-        </h1>
-        <p class="mt-4 text-center text-sm leading-relaxed text-slate-400 sm:text-[0.9375rem]">
-          위기 순간, 당신의 진짜 대피 스타일을 15개 문항으로 확인해 보세요!
-        </p>
-        <button
-          type="button"
-          id="btn-start-quiz"
-          class="cover-start-btn mt-9 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-4 text-[0.9375rem] font-bold text-slate-950 shadow-lg shadow-emerald-900/25 outline-none ring-2 ring-transparent transition duration-300 [transform:translateZ(0)] hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-xl hover:shadow-emerald-500/25 hover:brightness-105 focus-visible:ring-emerald-300/70 active:scale-[0.98] active:brightness-95"
-        >
-          <span aria-hidden="true">🚀</span>
-          테스트 시작하기
-        </button>
-      </div>
-    </section>
-
-    <div id="quiz-screen" class="pointer-events-none hidden flex flex-1 flex-col" aria-hidden="true">
-      <header class="mb-8 text-center">
-        <p class="text-xs font-medium uppercase tracking-[0.2em] text-emerald-400/90">Safety mindset</p>
-        <h1 class="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">나의 안전 성향 테스트</h1>
-        <p class="mt-3 text-sm leading-relaxed text-slate-400">
-          침수·야간·도심 위기 상황에서의 선택으로<br class="hidden sm:inline" />
-          나의 결정 스타일을 알아봅니다. (총 15문항)
-        </p>
-      </header>
-
-      <!-- Progress -->
-      <div id="progress-wrap" class="mb-6">
-        <div class="flex items-center justify-between text-xs text-slate-500">
-          <span>진행</span>
-          <span id="progress-label">1 / 15</span>
-        </div>
-        <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
-          <div id="progress-bar" class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-300" style="width: 0%"></div>
-        </div>
-      </div>
-
-      <!-- Quiz card -->
-      <section id="quiz-card" class="flex flex-1 flex-col rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 shadow-xl shadow-black/20 backdrop-blur-sm sm:p-8">
-      <div id="quiz-tabs" role="tablist" aria-label="테스트 화면 전환" class="mb-6 flex gap-1 rounded-xl border border-slate-800/90 bg-slate-950/60 p-1">
-        <button
-          type="button"
-          id="tab-questions"
-          role="tab"
-          aria-selected="true"
-          aria-controls="question-view"
-          class="tab-pill flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
-        >
-          문항
-        </button>
-        <button
-          type="button"
-          id="tab-result"
-          role="tab"
-          aria-selected="false"
-          aria-controls="result-screen"
-          disabled
-          class="tab-pill flex-1 rounded-lg py-2.5 text-sm font-semibold text-slate-500 transition enabled:cursor-pointer enabled:hover:text-slate-300 disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400"
-        >
-          결과보기
-        </button>
-      </div>
-
-      <div id="question-view" role="tabpanel">
-        <h2 id="question-text" class="text-lg font-semibold leading-snug text-white sm:text-xl"></h2>
-        <div id="choices" class="mt-6 flex flex-col gap-3"></div>
-      </div>
-
-      <div id="result-screen" role="tabpanel" class="hidden flex flex-1 flex-col">
-        <p class="text-xs font-medium uppercase tracking-widest text-emerald-400/90">결과</p>
-        <div class="mt-3">
-          <h2 id="result-title" class="text-2xl font-bold leading-tight text-white sm:text-[1.65rem]"></h2>
-          <p id="result-subtitle" class="mt-2 text-sm font-medium text-emerald-300/90"></p>
-        </div>
-
-        <section class="mt-5 rounded-2xl border border-slate-800/90 bg-slate-950/40 p-5 shadow-inner shadow-black/20">
-          <h3 class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">특징</h3>
-          <p id="result-traits" class="mt-3 text-sm leading-relaxed text-slate-200"></p>
-        </section>
-
-        <section class="mt-5 overflow-hidden rounded-2xl border border-slate-800/80 bg-gradient-to-br from-slate-900/80 to-slate-950/90 shadow-lg shadow-black/25">
-          <div class="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
-            <div class="flex shrink-0 justify-center sm:w-[9.5rem]">
-              <img
-                src="assets/zeromi.png"
-                alt="안전 마스코트 제로미"
-                class="h-36 w-auto max-w-[10rem] object-contain drop-shadow-2xl sm:h-44 sm:max-w-none"
-                width="160"
-                height="200"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <div class="min-w-0 flex-1">
-              <div
-                class="rounded-xl border border-[#6b7348] bg-[#2e331f]/95 px-4 py-4 shadow-lg shadow-black/20 ring-1 ring-inset ring-white/10 sm:px-5 sm:py-5"
-              >
-                <p class="text-sm font-semibold leading-snug text-[#dfe6c8]">
-                  <span class="mr-1.5" aria-hidden="true">🛡️</span>제로미의 원포인트 조언
-                </p>
-                <p id="result-advice" class="mt-3 text-sm leading-relaxed text-[#f2f5e8]"></p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div class="mt-6 grid grid-cols-2 gap-3 text-sm">
-          <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-            <p class="text-xs text-slate-500">신중함</p>
-            <p id="score-prudence" class="mt-1 text-2xl font-bold text-emerald-300">0</p>
-            <p class="mt-1 text-xs text-slate-500">vs 과감함 <span id="score-boldness" class="text-slate-400">0</span></p>
-          </div>
-          <div class="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-            <p class="text-xs text-slate-500">침착함</p>
-            <p id="score-calmness" class="mt-1 text-2xl font-bold text-cyan-300">0</p>
-            <p class="mt-1 text-xs text-slate-500">vs 급함 <span id="score-urgency" class="text-slate-400">0</span></p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          id="btn-restart"
-          class="mt-auto flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3.5 text-sm font-semibold text-slate-950 transition hover:opacity-95 active:scale-[0.99]"
-        >
-          다시 테스트하기
-        </button>
-      </div>
-    </section>
-    </div>
-
-    <p class="mt-6 text-center text-xs text-slate-600">
-      본 테스트는 교육·자가 점검 목적의 비공식 예시입니다.
-    </p>
-  </main>
-
-  <!-- 구독 안내 (15번 문항 직후) -->
-  <div
-    id="subscribe-modal"
-    class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="subscribe-modal-title"
-  >
-    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-[3px]" aria-hidden="true"></div>
-    <div
-      class="relative z-10 w-full max-w-md rounded-2xl border border-slate-700/90 bg-slate-900/95 p-6 shadow-2xl shadow-black/40 ring-1 ring-white/5 sm:p-7"
-    >
-      <p
-        id="subscribe-modal-title"
-        class="text-base font-semibold leading-relaxed text-white sm:text-[1.05rem]"
-      >
-        잠깐! 나의 안전 성향 결과를 확인하기 전, &lsquo;안전파수꾼 제로미&rsquo; 유튜브를 구독하시면 매달 새로운 생존 게임과 안전 정보를 가장 먼저 받아보실 수 있습니다!
-      </p>
-      <div class="mt-6 flex flex-col gap-3">
-        <button
-          type="button"
-          id="btn-subscribe-and-result"
-          class="flex w-full items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-900/30 transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300 active:scale-[0.99]"
-        >
-          구독하고 결과 확인하기
-          <span aria-hidden="true">🛡️</span>
-        </button>
-        <button
-          type="button"
-          id="btn-subscribe-later"
-          class="mx-auto px-2 py-2 text-xs font-medium text-gray-400 underline decoration-gray-500 underline-offset-2 transition hover:text-gray-300 hover:decoration-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
-        >
-          구독 없이 결과만 보기
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /**
-     * @typedef {'prudence'|'boldness'} AxisPB
-     * @typedef {'calmness'|'urgency'} AxisCU
-     */
-
-    const ZEROMI_CHANNEL_URL = 'https://www.youtube.com/@withZeromi';
-
-    const QUESTIONS = [
-      {
-        id: 1,
-        text: '출근길, 갑자기 쏟아진 폭우로 도로에 물이 차오르기 시작한다. 당신의 행동은?',
-        choices: [
-          {
-            label: 'A',
-            body: '물이 더 차기 전에 일단 빠르게 뛰어서 지하철역으로 간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-          {
-            label: 'B',
-            body: '주변을 살피며 물이 안 고인 안전한 보도블록이나 고지대로 우회한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-        ],
-      },
-      {
-        id: 2,
-        text: '길을 걷는데 저 앞의 맨홀 뚜껑이 수압 때문에 들썩거리며 덜컹 소리를 낸다.',
-        choices: [
-          {
-            label: 'A',
-            body: '위험해 보이니 멀찍이 돌아서 가거나 안전한 건물 안으로 피한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '설마 튕겨 나가겠어? 조심히 옆으로 비껴서 지나간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 3,
-        text: '침수 구역을 탈출하려는데, 저 멀리서 누군가 도움을 요청하는 듯한 소리가 들린다.',
-        choices: [
-          {
-            label: 'A',
-            body: '주변에 있는 긴 막대나 밧줄을 찾아 안전을 확보한 뒤 접근한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '일단 다급하니 몸을 던져 소리가 나는 곳으로 뛰어간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 4,
-        text: '가로등이 모두 꺼지고 정전된 밤, 무릎까지 물이 찬 거리를 지나가야 한다.',
-        choices: [
-          {
-            label: 'A',
-            body: '우산이나 막대기로 바닥을 콕콕 찔러보며 맨홀 구멍이 없는지 확인하며 걷는다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '스마트폰 손전등에 의지해 눈으로 길을 확인하며 서둘러 걸어간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 5,
-        text: '백화점에서 쇼핑 중 갑자기 화재 경보기가 울리고 대피 안내 방송이 나온다. 당신은?',
-        choices: [
-          {
-            label: 'A',
-            body: '연기가 보이기 전에 가방 등 소지품을 챙겨 빠르게 에스컬레이터나 계단으로 뛰어 내려간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-          {
-            label: 'B',
-            body: '소지품은 둔 채 주위의 비상구 표시를 확인하고, 안내원의 지시에 따라 차분히 계단으로 이동한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-        ],
-      },
-      {
-        id: 6,
-        text: '여름철 한낮, 폭염 경보가 발령된 상태에서 야외 활동을 하던 중 어지러움과 두통이 살짝 느껴진다.',
-        choices: [
-          {
-            label: 'A',
-            body: '이 정도쯤이야 금방 끝나니 조금만 더 서둘러서 하던 일을 마무리하고 가려고 한다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-          {
-            label: 'B',
-            body: '열사병 징후일 수 있으니 즉시 그늘과 시원한 곳으로 이동해 수분을 보충하고, 증상이 지속되면 활동을 중단해 쉬거나 도움을 요청한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-        ],
-      },
-      {
-        id: 7,
-        text: '가족들과 집에 있는데 갑자기 쿵 소리와 함께 바닥이 크게 흔들리는 지진이 발생했다.',
-        choices: [
-          {
-            label: 'A',
-            body: '문이 뒤틀려 갇힐 수 있으니 일단 현관문을 열어두고 식탁이나 테이블 밑으로 들어가 몸을 보호한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '위험하니까 일단 뒤도 돌아보지 않고 아파트 계단을 통해 밖으로 빠르게 뛰어 나간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 8,
-        text: '지하철을 타고 가는데 앞 칸에서 연기가 피어오르며 승객들이 다급하게 소리를 지른다.',
-        choices: [
-          {
-            label: 'A',
-            body: '우선 비상 버튼을 찾아 기관사에게 상황을 알리고, 객차 내 소화기 위치를 확인하며 대기한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '위험을 직감하고 즉시 승강장 문을 수동으로 열려고 시도하거나 반대편 칸으로 급히 도망친다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 9,
-        text: '길을 가다가 건물 외벽의 간판이 강풍에 덜렁거리며 곧 떨어질 것처럼 위태로운 것을 목격했다.',
-        choices: [
-          {
-            label: 'A',
-            body: '위험해 보이므로 즉시 가던 길을 멈추고 안전지대로 우회한 뒤, 119나 안전신문고에 신고한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '떨어지기 전에 떨어질 구역을 눈으로 확인하며 빠르게 뛰어서 지나쳐 간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 10,
-        text: '아파트 단지 내에서 야간에 산책을 하던 중, 짙은 타는 냄새와 함께 연기가 피어오르는 것을 보았다.',
-        choices: [
-          {
-            label: 'A',
-            body: '불이 크게 번지기 전에 즉시 소리를 질러 주변에 알리고 119에 정확한 위치를 신고한다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-          {
-            label: 'B',
-            body: '실제 불이 맞는지, 어디서 나는 연기인지 주변을 좀 더 신중하게 살펴보고 행동한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-        ],
-      },
-      {
-        id: 11,
-        text: '여름철 계곡으로 놀러 가려는데, 오후부터 강한 소나기와 기습 폭우가 예보되어 있다.',
-        choices: [
-          {
-            label: 'A',
-            body: '비가 오기 전까지는 괜찮을 테니 계획대로 출발하고, 비가 오면 그때 철수하기로 한다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-          {
-            label: 'B',
-            body: '계곡은 물이 순식간에 불어나 고립될 수 있으므로 여행 일정을 연기하거나 안전한 실내로 계획을 변경한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-        ],
-      },
-      {
-        id: 12,
-        text: '가정에서 요리를 하던 중 식용유에 불이 붙어 냄비 위로 불길이 확 피어올랐다.',
-        choices: [
-          {
-            label: 'A',
-            body: '싱크대 물을 바가지에 급히 받아 불길이 번진 곳에 빠르게 끼얹는다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-          {
-            label: 'B',
-            body: '물을 부으면 불길이 더 커지므로 주방용 K급소화기로 불을 끈다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-        ],
-      },
-      {
-        id: 13,
-        text: '운전 중 도로 맞은편에서 역주행해 오는 차량을 발견하고 급브레이크를 밟아야 하는 순간이다.',
-        choices: [
-          {
-            label: 'A',
-            body: '당황하지 않고 비상등을 켜며 주변 차선의 흐름을 살피고 안전하게 갓길이나 옆 차선으로 피한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '순간적인 공포에 옆 차선을 충분히 확인하지 못한 채 핸들을 급히 꺾거나, 위기 직후에도 급격히 속도를 내어 자리를 피한다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 14,
-        text: '산행 중 갑자기 예상치 못한 짙은 안개가 끼고 경고 방송으로 멧돼지 출몰 지역임을 알렸다.',
-        choices: [
-          {
-            label: 'A',
-            body: '이정표를 신중하게 확인하며 등산로를 벗어나지 않고 지정된 대피소나 하산로로 천천히 이동한다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '안개가 더 짙어지거나 멧돼지를 만나기 전에 지름길처럼 보이는 곳으로 서둘러 뛰어 내려간다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-      {
-        id: 15,
-        text: '새로 이사한 아파트나 건물의 비상구 위치와 소화기 배치 현황을 확인하는 편인가?',
-        choices: [
-          {
-            label: 'A',
-            body: '내 안전은 내가 지킨다! 이사 오거나 방문한 직후에 비상 대피로와 소화기 위치를 꼼꼼히 확인해 둔다.',
-            scores: { prudence: 1, boldness: 0, calmness: 1, urgency: 0 },
-          },
-          {
-            label: 'B',
-            body: '굳이 미리 찾아보지 않아도 위급 상황이 닥치면 눈앞의 안내판을 보고 충분히 대처할 수 있다고 생각한다.',
-            scores: { prudence: 0, boldness: 1, calmness: 0, urgency: 1 },
-          },
-        ],
-      },
-    ];
-
-    const RESULT_COPY = {
-      veteran: {
-        title: '위기 극복 베테랑 파수꾼',
-        subtitle: '신중함 + 침착함',
-        traits:
-          '위기 상황에서 가장 이상적인 생존자입니다. 주변 환경을 냉철하게 분석하고 비상구와 안전장비를 먼저 확보하는 철저함을 가졌습니다. 어떤 재난이 닥쳐도 패닉에 빠지지 않고 정석대로 행동하는 움직이는 안전 교과서입니다.',
-        advice:
-          '훌륭해요! 당신은 주위 사람들을 안전하게 이끌어줄 수 있는 최고의 리더입니다. 재난 시 주변에 공포가 확산되지 않도록 차분하게 대피로를 안내해 주세요!',
-      },
-      strategist: {
-        title: '생각은 깊지만 마음이 급한 전략가',
-        subtitle: '신중함 + 급함',
-        traits:
-          '무엇이 위험하고 어떻게 대처해야 하는지 머릿속으로는 완벽하게 알고 있습니다. 하지만 막상 실제 상황이 닥치면 마음이 앞서 몸이 굳거나 서두르다 발을 헛디딜 위험이 있습니다. 지식은 풍부하나 행동의 템포를 조절할 필요가 있습니다.',
-        advice:
-          '안전 수칙을 잘 아는 당신! 위기 순간에는 딱 \'3초만 심호흡\'을 하고 행동해 보세요. 아는 대로 차분하게만 움직이면 생존율 100%입니다!',
-      },
-      operator: {
-        title: '행동파 생존 전문가',
-        subtitle: '과감함 + 침착함',
-        traits:
-          '뛰어난 순발력과 과단성을 지닌 실전형 생존자입니다. 위기가 닥쳤을 때 머뭇거리지 않고 빠르게 결단을 내리며, 몸을 움직이는 속도가 매우 빠릅니다. 침착함까지 갖추어 대담하면서도 치명적인 실수를 피하는 감각이 탁월합니다.',
-        advice:
-          '돌파력이 엄청나시군요! 다만, 과감한 행동 전후로 \'보이지 않는 위험 요소(예: 물속의 맨홀 등)\'가 없는지 아주 살짝만 더 확인하는 습관을 지니면 무적입니다!',
-      },
-      sprinter: {
-        title: '직진형 열정 대피자',
-        subtitle: '과감함 + 급함',
-        traits:
-          '위기를 직감하는 순간 온몸의 에너지를 뿜어내며 탈출에 집중하는 열정적인 생존자입니다. 엄청난 기동력을 가졌지만, 마음이 너무 급해 눈앞의 경고 표지판을 놓치거나 다급하게 뛰다가 2차 사고를 당할 위험이 가장 높은 성향입니다.',
-        advice:
-          '재난 상황에서 속도도 중요하지만, 가장 중요한 건 \'정확한 방향\'과 \'안전 확보\'입니다. 뛰기 전에 비상구 위치를 먼저 보고, 주변 안내 방송에 귀를 기울여 주세요!',
-      },
-    };
-
-    function getResultType(prudence, boldness, calmness, urgency) {
-      const prudenceWins = prudence >= boldness;
-      const calmWins = calmness >= urgency;
-      if (prudenceWins && calmWins) return 'veteran';
-      if (prudenceWins && !calmWins) return 'strategist';
-      if (!prudenceWins && calmWins) return 'operator';
-      return 'sprinter';
-    }
-
-    const state = {
-      index: 0,
-      prudence: 0,
-      boldness: 0,
-      calmness: 0,
-      urgency: 0,
-      quizComplete: false,
-      /** @type {'questions'|'result'} */
-      uiTab: 'questions',
-    };
-
-    const TAB_FOCUS =
-      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400';
-
-    const bgmState = {
-      /** 사용자가 명시적으로 끈 상태면 자동 재생하지 않음 */
-      userMuted: false,
-      defaultVolume: 0.34,
-    };
-
-    const el = {
-      progressLabel: document.getElementById('progress-label'),
-      progressBar: document.getElementById('progress-bar'),
-      questionText: document.getElementById('question-text'),
-      choices: document.getElementById('choices'),
-      questionView: document.getElementById('question-view'),
-      resultScreen: document.getElementById('result-screen'),
-      startScreen: document.getElementById('start-screen'),
-      quizScreen: document.getElementById('quiz-screen'),
-      btnStartQuiz: document.getElementById('btn-start-quiz'),
-      progressWrap: document.getElementById('progress-wrap'),
-      tabQuestions: document.getElementById('tab-questions'),
-      tabResult: document.getElementById('tab-result'),
-      resultTitle: document.getElementById('result-title'),
-      resultSubtitle: document.getElementById('result-subtitle'),
-      resultTraits: document.getElementById('result-traits'),
-      resultAdvice: document.getElementById('result-advice'),
-      scorePrudence: document.getElementById('score-prudence'),
-      scoreBoldness: document.getElementById('score-boldness'),
-      scoreCalmness: document.getElementById('score-calmness'),
-      scoreUrgency: document.getElementById('score-urgency'),
-      btnRestart: document.getElementById('btn-restart'),
-      subscribeModal: document.getElementById('subscribe-modal'),
-      btnSubscribeAndResult: document.getElementById('btn-subscribe-and-result'),
-      btnSubscribeLater: document.getElementById('btn-subscribe-later'),
-      bgm: document.getElementById('app-bgm'),
-      btnBgmToggle: document.getElementById('btn-bgm-toggle'),
-      btnBgmIcon: document.getElementById('btn-bgm-icon'),
-      btnBgmLabel: document.getElementById('btn-bgm-label'),
-    };
-
-    function refreshBgmToggleUi() {
-      if (!el.bgm || !el.btnBgmToggle) return;
-      const playing = !el.bgm.paused;
-      el.btnBgmToggle.setAttribute('aria-pressed', playing ? 'true' : 'false');
-      el.btnBgmToggle.setAttribute('aria-label', playing ? '배경 음악 끄기' : '배경 음악 켜기');
-      if (el.btnBgmIcon) el.btnBgmIcon.textContent = playing ? '🔊' : '🔇';
-      if (el.btnBgmLabel) el.btnBgmLabel.textContent = playing ? '음악 끄기' : '음악 켜기';
-    }
-
-    function pauseBgm() {
-      if (!el.bgm) return;
-      el.bgm.pause();
-      refreshBgmToggleUi();
-    }
-
-    function tryResumeBgm() {
-      if (!el.bgm || bgmState.userMuted) return;
-      el.bgm.volume = bgmState.defaultVolume;
-      const p = el.bgm.play();
-      if (p && typeof p.catch === 'function') {
-        p.catch(() => {});
-      }
-      refreshBgmToggleUi();
-    }
-
-    function renderTabs() {
-      const onQ = state.uiTab === 'questions';
-      const onR = state.uiTab === 'result';
-      const quizComplete = state.quizComplete;
-
-      el.tabResult.disabled = !quizComplete;
-
-      el.tabQuestions.setAttribute('aria-selected', onQ ? 'true' : 'false');
-      el.tabResult.setAttribute('aria-selected', onR && quizComplete ? 'true' : 'false');
-
-      const baseQ = `flex-1 rounded-lg py-2.5 text-sm font-semibold transition ${TAB_FOCUS}`;
-      const baseR = `flex-1 rounded-lg py-2.5 text-sm font-semibold transition ${TAB_FOCUS}`;
-
-      if (onQ) {
-        el.tabQuestions.className = `${baseQ} bg-slate-800 text-white shadow-sm ring-1 ring-slate-700/80`;
-        el.tabResult.className = quizComplete
-          ? `${baseR} bg-transparent text-slate-400 hover:text-slate-200`
-          : `${baseR} cursor-not-allowed bg-transparent text-slate-600 opacity-50`;
-      } else {
-        el.tabQuestions.className = `${baseQ} bg-transparent text-slate-400 hover:text-slate-200`;
-        el.tabResult.className = `${baseR} bg-slate-800 text-white shadow-sm ring-1 ring-emerald-500/35`;
-      }
-    }
-
-    function renderCompletionView() {
-      el.questionText.textContent = '모든 문항을 완료했습니다!';
-      el.choices.innerHTML =
-        '<p class="py-2 text-center text-sm leading-relaxed text-slate-400">위의 <strong class="font-semibold text-emerald-400/95">결과보기</strong> 탭을 눌러 나의 안전 성향 결과를 확인해 보세요.</p>';
-    }
-
-    function renderPostQuizHold() {
-      el.questionText.textContent = '15개 문항에 모두 답했어요!';
-      el.choices.innerHTML =
-        '<p class="py-3 text-center text-sm leading-relaxed text-slate-500">팝업 안내를 확인한 뒤 결과를 확인할 수 있어요.</p>';
-    }
-
-    function openSubscribeModal() {
-      el.subscribeModal.classList.remove('hidden');
-      el.subscribeModal.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('overflow-hidden');
-    }
-
-    function revealQuizFromCover() {
-      if (el.btnStartQuiz.disabled) return;
-      el.btnStartQuiz.disabled = true;
-
-      tryResumeBgm();
-
-      el.startScreen.classList.add('cover-leaving');
-
-      window.setTimeout(() => {
-        el.startScreen.classList.add('hidden');
-        el.startScreen.classList.remove('cover-leaving');
-        el.quizScreen.classList.remove('hidden', 'pointer-events-none');
-        el.quizScreen.setAttribute('aria-hidden', 'false');
-        el.quizScreen.classList.add('quiz-entering');
-
-        const onAnimEnd = (e) => {
-          if (e.animationName !== 'quizEnter') return;
-          el.quizScreen.removeEventListener('animationend', onAnimEnd);
-          el.quizScreen.classList.remove('quiz-entering');
-          el.btnStartQuiz.disabled = false;
-        };
-        el.quizScreen.addEventListener('animationend', onAnimEnd);
-      }, 450);
-    }
-
-    function hideSubscribeModal() {
-      el.subscribeModal.classList.add('hidden');
-      el.subscribeModal.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('overflow-hidden');
-    }
-    function finishQuizAfterSubscribePrompt(openChannel) {
-      hideSubscribeModal();
-      if (openChannel) {
-        window.open(ZEROMI_CHANNEL_URL, '_blank', 'noopener,noreferrer');
-      }
-      showResult();
-    }
-
-    function setProgress() {
-      const step = state.quizComplete ? QUESTIONS.length : Math.min(state.index + 1, QUESTIONS.length);
-      el.progressLabel.textContent = `${step} / ${QUESTIONS.length}`;
-      const pct = (step / QUESTIONS.length) * 100;
-      el.progressBar.style.width = `${pct}%`;
-    }
-
-    function renderQuestion() {
-      if (state.quizComplete && state.uiTab === 'questions') {
-        renderCompletionView();
-        setProgress();
-        renderTabs();
-        return;
-      }
-
-      const q = QUESTIONS[state.index];
-      el.questionText.textContent = q.text;
-      el.choices.innerHTML = '';
-      q.choices.forEach((c) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className =
-          'group flex w-full gap-4 rounded-xl border border-slate-700/80 bg-slate-950/40 p-4 text-left transition hover:border-emerald-500/50 hover:bg-slate-800/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400';
-        btn.innerHTML = `
-          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-sm font-bold text-emerald-300 ring-1 ring-slate-700 group-hover:ring-emerald-500/40">${c.label}</span>
-          <span class="text-sm leading-relaxed text-slate-200">${c.body}</span>
-        `;
-        btn.addEventListener('click', () => selectChoice(c.scores));
-        el.choices.appendChild(btn);
-      });
-      setProgress();
-      renderTabs();
-    }
-
-    function selectChoice(scores) {
-      state.prudence += scores.prudence;
-      state.boldness += scores.boldness;
-      state.calmness += scores.calmness;
-      state.urgency += scores.urgency;
-
-      if (state.index < QUESTIONS.length - 1) {
-        state.index += 1;
-        renderQuestion();
-        return;
-      }
-
-      state.quizComplete = true;
-      state.uiTab = 'questions';
-      setProgress();
-      renderTabs();
-      renderPostQuizHold();
-      openSubscribeModal();
-    }
-
-    function showResult() {
-      if (!state.quizComplete) return;
-
-      hideSubscribeModal();
-
-      state.uiTab = 'result';
-      el.questionView.classList.add('hidden');
-      el.progressWrap.classList.add('hidden');
-      el.resultScreen.classList.remove('hidden');
-      renderTabs();
-
-      const key = getResultType(state.prudence, state.boldness, state.calmness, state.urgency);
-      const copy = RESULT_COPY[key];
-      el.resultTitle.textContent = copy.title;
-      el.resultSubtitle.textContent = `(${copy.subtitle})`;
-      el.resultTraits.textContent = copy.traits;
-      el.resultAdvice.textContent = copy.advice;
-      el.scorePrudence.textContent = String(state.prudence);
-      el.scoreBoldness.textContent = String(state.boldness);
-      el.scoreCalmness.textContent = String(state.calmness);
-      el.scoreUrgency.textContent = String(state.urgency);
-
-      /*
-       * 부모 창 전송 요청 시: window.parent !== window 일 때만
-       * postMessage(payload, '*') 또는 알려준 origin 사용.
-       * (현재 사용자 요청에 따라 여기서는 전송 호출 없음.)
-       */
-    }
-
-    function showCompletionScreen() {
-      state.uiTab = 'questions';
-      el.resultScreen.classList.add('hidden');
-      el.questionView.classList.remove('hidden');
-      el.progressWrap.classList.remove('hidden');
-      renderTabs();
-      renderCompletionView();
-      setProgress();
-    }
-
-    function restart() {
-      state.index = 0;
-      state.prudence = 0;
-      state.boldness = 0;
-      state.calmness = 0;
-      state.urgency = 0;
-      state.quizComplete = false;
-      state.uiTab = 'questions';
-      hideSubscribeModal();
-      el.resultScreen.classList.add('hidden');
-      el.questionView.classList.remove('hidden');
-      el.progressWrap.classList.remove('hidden');
-      renderTabs();
-      renderQuestion();
-    }
-
-    el.tabQuestions.addEventListener('click', () => {
-      if (!state.quizComplete) return;
-      if (state.uiTab === 'result') showCompletionScreen();
-    });
-
-    el.tabResult.addEventListener('click', () => {
-      if (!state.quizComplete || el.tabResult.disabled) return;
-      showResult();
-    });
-
-    el.btnSubscribeAndResult.addEventListener('click', () => {
-      if (!state.quizComplete) return;
-      finishQuizAfterSubscribePrompt(true);
-    });
-
-    el.btnSubscribeLater.addEventListener('click', () => {
-      if (!state.quizComplete) return;
-      finishQuizAfterSubscribePrompt(false);
-    });
-
-    if (el.bgm) {
-      el.bgm.addEventListener('play', refreshBgmToggleUi);
-      el.bgm.addEventListener('pause', refreshBgmToggleUi);
-    }
-
-    el.btnBgmToggle.addEventListener('click', () => {
-      if (!el.bgm) return;
-      const playing = !el.bgm.paused;
-      if (playing) {
-        bgmState.userMuted = true;
-        pauseBgm();
-        return;
-      }
-      bgmState.userMuted = false;
-      tryResumeBgm();
-    });
-
-    el.btnStartQuiz.addEventListener('click', revealQuizFromCover);
-
-    el.btnRestart.addEventListener('click', restart);
-    refreshBgmToggleUi();
-    renderQuestion();
-  </script>
+  <script src="js/app.js"></script>
 </body>
 </html>
