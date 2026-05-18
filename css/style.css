@@ -185,6 +185,26 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.landing-cover {
+  margin: 6px 0 4px;
+  width: 100%;
+  border-radius: calc(var(--radius) + 6px);
+  overflow: hidden;
+  border: 1px solid var(--choice-border);
+  box-shadow: var(--shadow);
+  background: var(--choice-bg);
+  line-height: 0;
+}
+
+.landing-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(40vh, 300px);
+  object-fit: cover;
+  object-position: center;
+}
+
 .title {
   margin: 0;
   font-size: clamp(1.85rem, 7vw, 2.35rem);
